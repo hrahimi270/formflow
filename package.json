@@ -5,19 +5,35 @@
   "type": "module",
   "description": "Single-page GitHub Pages website for the FormFlow Strapi plugin.",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "dev": "vite-react-ssg dev",
+    "build": "tsc --noEmit && vite-react-ssg build && node scripts/postbuild-seo.mjs",
+    "preview": "vite preview --outDir dist",
     "check": "tsc --noEmit --pretty false"
   },
   "dependencies": {
+    "@mdx-js/react": "^3.1.1",
+    "@mdx-js/rollup": "^3.1.1",
+    "mdast-util-to-string": "^4.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.4",
+    "reading-time": "^1.5.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-mdx-import-media": "^1.4.0",
+    "rehype-pretty-code": "^0.14.3",
+    "rehype-slug": "^6.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx-frontmatter": "^5.2.0",
+    "shiki": "^4.3.0",
+    "vite-react-ssg": "^0.9.0"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.14",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "gray-matter": "^4.0.3",
     "typescript": "^5.9.3",
     "vite": "^6.4.3"
   }
