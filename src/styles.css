@@ -171,22 +171,12 @@ code {
   font-size: 1.06rem;
   letter-spacing: -0.02em;
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: var(--surface);
-  border: 1.5px solid var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-wash);
-}
-.brand-caret {
-  width: 2px;
-  height: 14px;
-  border-radius: 2px;
-  background: var(--accent);
-  animation: blink 1.2s steps(1) infinite;
+.brand-logo {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex: none;
 }
 
 .nav-links {
@@ -1694,7 +1684,6 @@ code {
     transform: none;
     transition: none;
   }
-  .brand-caret,
   .ff-caret {
     animation: none;
   }

@@ -1,4 +1,8 @@
-# FormFlow website
+<p align="center">
+  <img src="assets/logo.jpg" alt="FormFlow" width="120" height="120" />
+</p>
+
+<h1 align="center">FormFlow website</h1>
 
 Single-page static website for the FormFlow Strapi plugin. It is Vite + React and builds to plain static files in `dist/`, so it works on GitHub Pages.
 

@@ -22,6 +22,8 @@ const navLinks = [
 
 const compat = ['Strapi 5', 'REST API', 'React', 'Vue', 'Next.js', 'Nuxt', 'Astro', 'Vite'];
 
+const LOGO = `${import.meta.env.BASE_URL}logo.png`;
+
 // Real captures from a live FormFlow install, served from /public/shots.
 const asset = (file: string) => `${import.meta.env.BASE_URL}shots/${file}`;
 const gallery = [
@@ -540,9 +542,8 @@ function App() {
 
       <header className="nav">
         <a href="#top" className="brand" aria-label="FormFlow home">
-          <span className="brand-mark" aria-hidden="true">
-            <span className="brand-caret" />
-          </span>
+          <img className="brand-logo" src={LOGO} alt="" width={28} height={28} />
+
           <span className="brand-word">FormFlow</span>
         </a>
         <nav className="nav-links" aria-label="Sections">
@@ -948,9 +949,7 @@ function App() {
       <footer className="footer">
         <div className="footer-brand">
           <a href="#top" className="brand">
-            <span className="brand-mark" aria-hidden="true">
-              <span className="brand-caret" />
-            </span>
+            <img className="brand-logo" src={LOGO} alt="" width={28} height={28} />
             <span className="brand-word">FormFlow</span>
           </a>
           <p>Strapi forms without the glue code.</p>
