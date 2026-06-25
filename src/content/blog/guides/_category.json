@@ -1,0 +1,8 @@
+{
+  "slug": "guides",
+  "name": "Guides",
+  "title": "FormFlow Guides & Concepts",
+  "description": "Concept and architecture articles — how headless forms work, when to reach for FormFlow, and how the pieces fit together across Strapi and your frontend.",
+  "order": 2,
+  "accent": "violet"
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "product-updates",
+  "name": "Product Updates",
+  "title": "FormFlow Product Updates",
+  "description": "Release notes, new features and changes across the FormFlow Strapi plugin and the headless React and Vue SDKs.",
+  "order": 3,
+  "accent": "valid"
+}
