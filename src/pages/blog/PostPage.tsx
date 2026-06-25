@@ -42,6 +42,7 @@ export function Component() {
         title={fm.seo?.title ?? fm.title}
         description={fm.description}
         image={post.ogImageUrl || undefined}
+        imageAlt={fm.heroAlt}
         canonical={fm.seo?.canonical}
         type="article"
         publishedTime={published}
@@ -66,7 +67,8 @@ export function Component() {
 
       {post.heroUrl ? (
         <figure className="post-hero">
-          <img src={post.heroUrl} alt={fm.heroAlt} decoding="async" />
+          {/* Hero is the LCP element — load eagerly with high priority. */}
+          <img src={post.heroUrl} alt={fm.heroAlt} decoding="async" fetchPriority="high" />
         </figure>
       ) : null}
 

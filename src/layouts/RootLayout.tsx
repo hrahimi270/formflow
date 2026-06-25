@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
 import SiteFooter from '../components/SiteFooter';
-import Seo from '../components/seo/Seo';
 import '../styles.css';
 import '../styles/blog.css';
 
@@ -29,9 +28,8 @@ export default function RootLayout() {
 
   return (
     <div className="page">
-      {/* Site-wide fallback. Per-page <Seo> (rendered later in the tree)
-          overrides these via react-helmet's last-wins dedup. */}
-      <Seo />
+      {/* Each page renders its own <Seo>; there is no layout-level fallback so
+          noindex pages (e.g. 404) stay free of a canonical. */}
       <a className="skip-link" href="#main">
         Skip to content
       </a>

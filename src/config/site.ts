@@ -23,8 +23,10 @@ export const REPO_URL = 'https://github.com/hrahimi270/strapi-plugin-formflow';
 export const SDK_REPO_URL = 'https://github.com/hrahimi270/formflow-sdk';
 export const NPM_URL = 'https://www.npmjs.com/package/@formflowjs/strapi-plugin-formflow';
 
-/** Default social card. Replace public/og-default.png with a real 1200x630 image. */
-export const DEFAULT_OG_IMAGE_PATH = 'og-default.png';
+/** Default social card for non-article pages: the square brand logo
+ * (public/logo.png, 500x500). Post pages override this with their own hero.
+ * Point this at a dedicated 1200x630 card here if you create one. */
+export const DEFAULT_OG_IMAGE_PATH = 'logo.png';
 
 export interface OrgInfo {
   name: string;
