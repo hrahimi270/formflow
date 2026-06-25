@@ -226,24 +226,26 @@ const endpoints = [
   { method: 'GET', path: '/api/formflow/forms/:slug/partial/:token', desc: 'Resume a saved draft' },
 ];
 
+type Billing = 'annual' | 'lifetime';
+type Price = { price: string; note: string };
+
 const pricing: {
   tier: string;
   badge: Tier;
   blurb: string;
   features: string[];
-  price?: string;
-  cadence?: string;
-  cta?: string;
   available: boolean;
-  featured?: boolean;
+  cta?: string;
+  // Free is a single flat price; paid tiers switch with the billing toggle.
+  flat?: Price;
+  prices?: Record<Billing, Price>;
 }[] = [
   {
     tier: 'Free',
     badge: 'free',
-    price: '$0',
-    cadence: 'free forever · MIT',
-    cta: 'Install free',
     available: true,
+    cta: 'Install free',
+    flat: { price: '$0', note: 'free forever · MIT' },
     blurb: 'A production-ready form builder. Not a trial.',
     features: [
       'Unlimited forms & submissions',
@@ -260,6 +262,10 @@ const pricing: {
     badge: 'pro',
     available: false,
     blurb: 'Everything to ship serious forms.',
+    prices: {
+      annual: { price: '$99', note: 'per project · billed yearly' },
+      lifetime: { price: '$249', note: 'per project · one-time' },
+    },
     features: [
       'Everything in Free, plus —',
       'Advanced fields & conditional logic',
@@ -275,6 +281,10 @@ const pricing: {
     badge: 'business',
     available: false,
     blurb: 'For compliance-bound teams.',
+    prices: {
+      annual: { price: '$399', note: 'per project · billed yearly' },
+      lifetime: { price: '$999', note: 'per project · one-time' },
+    },
     features: [
       'Everything in Pro, plus —',
       'GDPR retention & anonymization',
@@ -533,6 +543,7 @@ function FormSpecimen() {
 function App() {
   const [activeSdk, setActiveSdk] = useState(1);
   const sdk = sdks[activeSdk];
+  const [billing, setBilling] = useState<Billing>('annual');
 
   return (
     <div className="page">
@@ -832,48 +843,66 @@ function App() {
               runtime by a license key; remove it and FormFlow keeps capturing submissions as the free tier.
             </p>
           </div>
+          <div className="billing-toggle" role="tablist" aria-label="Billing period">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={billing === 'annual'}
+              className={billing === 'annual' ? 'is-active' : ''}
+              onClick={() => setBilling('annual')}
+            >
+              Annual
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={billing === 'lifetime'}
+              className={billing === 'lifetime' ? 'is-active' : ''}
+              onClick={() => setBilling('lifetime')}
+            >
+              Lifetime
+            </button>
+          </div>
+
           <div className="price-grid">
-            {pricing.map((plan) => (
-              <article key={plan.tier} className={`price-card${!plan.available ? ' is-soon' : ''}`}>
-                {plan.available ? null : <span className="price-flag soon">Coming soon</span>}
-                <div className="price-top">
-                  <div className="price-tier">
-                    <h3>{plan.tier}</h3>
-                    <TierBadge tier={plan.badge} />
+            {pricing.map((plan) => {
+              const p = plan.prices ? plan.prices[billing] : plan.flat!;
+              return (
+                <article key={plan.tier} className={`price-card${!plan.available ? ' is-soon' : ''}`}>
+                  {plan.available ? null : <span className="price-flag soon">Coming soon</span>}
+                  <div className="price-top">
+                    <div className="price-tier">
+                      <h3>{plan.tier}</h3>
+                      <TierBadge tier={plan.badge} />
+                    </div>
+                    <p className="price-blurb">{plan.blurb}</p>
                   </div>
-                  <p className="price-blurb">{plan.blurb}</p>
-                </div>
-                <div className="price-amount">
+                  <div className="price-amount">
+                    <strong>{p.price}</strong>
+                    <span>{p.note}</span>
+                  </div>
+                  <ul className="price-features">
+                    {plan.features.map((feat) => (
+                      <li key={feat}>
+                        <span className="feat-tick">
+                          <CheckIcon />
+                        </span>
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
                   {plan.available ? (
-                    <>
-                      <strong>{plan.price}</strong>
-                      {plan.cadence ? <span>{plan.cadence}</span> : null}
-                    </>
+                    <a className="btn btn-primary price-cta" href="#install">
+                      {plan.cta}
+                    </a>
                   ) : (
-                    <strong className="soon-price">Coming soon</strong>
+                    <button className="btn btn-ghost price-cta" type="button" disabled aria-disabled="true">
+                      Coming soon
+                    </button>
                   )}
-                </div>
-                <ul className="price-features">
-                  {plan.features.map((feat) => (
-                    <li key={feat}>
-                      <span className="feat-tick">
-                        <CheckIcon />
-                      </span>
-                      {feat}
-                    </li>
-                  ))}
-                </ul>
-                {plan.available ? (
-                  <a className="btn btn-primary price-cta" href="#install">
-                    {plan.cta}
-                  </a>
-                ) : (
-                  <button className="btn btn-ghost price-cta" type="button" disabled aria-disabled="true">
-                    Coming soon
-                  </button>
-                )}
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </section>
 

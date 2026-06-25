@@ -1180,6 +1180,34 @@ code {
 /* ----------------------------------------------------------------- */
 /* Pricing                                                           */
 /* ----------------------------------------------------------------- */
+.billing-toggle {
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  margin: 0 auto 30px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.billing-toggle button {
+  padding: 9px 22px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.billing-toggle button.is-active {
+  background: var(--ink);
+  color: #fff;
+}
+
 .price-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
