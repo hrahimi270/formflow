@@ -63,7 +63,7 @@ const pipeline = [
   {
     kicker: 'Validate',
     title: 'Catch bad input, both ends',
-    body: 'Per-field rules with custom messages. The SDKs validate client-side with exact parity to the server, so a submission never lands half-checked.',
+    body: 'Per-field rules with custom messages. The SDKs validate client-side against the same schema the server enforces, so nothing lands half-checked.',
     tags: ['per-field rules', 'client + server parity'],
   },
   {
@@ -249,7 +249,7 @@ const pricing: {
     blurb: 'A production-ready form builder. Not a trial.',
     features: [
       'Unlimited forms & submissions',
-      '20+ field types incl. file upload',
+      'Every standard field type, incl. file upload',
       'All validation rules',
       'Submission inbox + CSV / JSON export',
       'Honeypot, rate limit & reCAPTCHA v2',
@@ -299,7 +299,7 @@ const pricing: {
 type Cell = boolean | 'all';
 const matrix: { capability: string; free: Cell; pro: Cell; business: Cell }[] = [
   { capability: 'Unlimited forms & submissions', free: true, pro: true, business: true },
-  { capability: '20+ field types, validation, inbox', free: true, pro: true, business: true },
+  { capability: 'Core field types, validation, inbox', free: true, pro: true, business: true },
   { capability: 'File upload field', free: true, pro: true, business: true },
   { capability: 'CSV / JSON export', free: true, pro: true, business: true },
   { capability: 'Spam basics (honeypot, rate limit, v2)', free: true, pro: true, business: true },
@@ -583,13 +583,13 @@ function App() {
               Render them <em>anywhere</em>.
             </h1>
             <p className="lede">
-              FormFlow turns Strapi into a form operations hub — visual building, validated submissions,
-              spam protection, email, webhooks, and exports — served over one clean REST API. Bring your
-              own framework and your own markup.
+              FormFlow turns Strapi into a complete form backend — visual building, validated submissions,
+              spam protection, email, webhooks, and exports — served over one clean REST API. Every
+              submission lands in your own database; your frontend renders it with your own markup.
             </p>
             <div className="hero-actions">
               <a className="btn btn-primary" href="#install">
-                Install the plugin <ArrowIcon />
+                Install free <ArrowIcon />
               </a>
               <a className="btn btn-ghost" href="#sdks">
                 Explore the SDKs
@@ -597,13 +597,13 @@ function App() {
             </div>
             <ul className="hero-proof">
               <li>
-                <CheckIcon /> MIT-licensed free core
+                <CheckIcon /> MIT-licensed core — free forever, not a trial
               </li>
               <li>
-                <CheckIcon /> Submissions never break on a lapsed license
+                <CheckIcon /> Submissions keep landing, even if a license lapses
               </li>
               <li>
-                <CheckIcon /> No CSS shipped — every element is yours
+                <CheckIcon /> No CSS shipped — your markup, your design system
               </li>
             </ul>
           </div>
@@ -837,7 +837,7 @@ function App() {
         <section className="section pricing" id="pricing" aria-labelledby="pricing-title">
           <div className="section-head center">
             <SectionLabel index="06">Pricing</SectionLabel>
-            <h2 id="pricing-title">Start free. Upgrade per project when the workflows grow.</h2>
+            <h2 id="pricing-title">Start free. Upgrade per project when your workflows grow.</h2>
             <p className="section-sub">
               The free core is genuinely production-ready — not a trial. Pro and Business are gated at
               runtime by a license key; remove it and FormFlow keeps capturing submissions as the free tier.
