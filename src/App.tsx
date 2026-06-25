@@ -128,7 +128,6 @@ const fieldGroups: { label: string; fields: { name: string; tier: Tier }[] }[] =
       { name: 'rich text', tier: 'pro' },
       { name: 'calculated', tier: 'pro' },
       { name: 'payment', tier: 'pro' },
-      { name: 'consent', tier: 'business' },
     ],
   },
 ];
@@ -139,18 +138,82 @@ const sdks = [
     tag: 'Framework-agnostic',
     install: 'npm i @formflowjs/core',
     body: 'The engine: TypeScript types for the content-API contract, a tiny fetch client, a schema-driven form store, client-side validation, conditional visibility, multi-step flow, uploads, and captcha plumbing. No framework, no CSS.',
+    file: 'client.ts',
+    lang: 'TypeScript',
+    code: `import { createFormFlowClient } from '@formflowjs/core';
+
+// Framework-agnostic: types + content-API client + form store.
+const client = createFormFlowClient({
+  baseUrl: 'https://cms.example.com',
+});
+
+// Fetch the sanitized, fully-typed schema by slug.
+const schema = await client.getForm('contact-us');
+
+// schema.fields, schema.settings, schema.steps — all typed.`,
   },
   {
     name: '@formflowjs/react',
     tag: 'React · Next.js · Astro',
     install: 'npm i @formflowjs/react',
     body: 'Headless hooks and renderless fields with ARIA-complete prop getters. SSR/RSC-safe via useSyncExternalStore, with a "use client" banner baked in for the App Router.',
+    file: 'contact-form.tsx',
+    lang: 'React',
+    code: `import {
+  FormFlowProvider, FormFlowField, useFormFlow,
+} from '@formflowjs/react';
+
+function Fields() {
+  const f = useFormFlow();
+  return (
+    <form {...f.getFormProps()}>
+      {f.fields.map((field) => (
+        <FormFlowField key={field.name} name={field.name}
+          render={(api) => (
+            <label {...api.getLabelProps()}>
+              {api.field.label}
+              <input {...api.getInputProps()} />
+              {api.invalid && <span>{api.error}</span>}
+            </label>
+          )} />
+      ))}
+      <button disabled={f.isSubmitting}>
+        {f.schema.settings.submitButtonText}
+      </button>
+    </form>
+  );
+}`,
   },
   {
     name: '@formflowjs/vue',
     tag: 'Vue 3 · Nuxt',
     install: 'npm i @formflowjs/vue',
     body: 'Renderless components and composables exposing reactive state, prop bags, multi-step helpers, and client-safe file/captcha handling — the same engine, idiomatic Vue.',
+    file: 'ContactForm.vue',
+    lang: 'Vue',
+    code: `<script setup lang="ts">
+import { FormFlow, FormFlowField } from '@formflowjs/vue';
+// schema + baseUrl fetched with createFormFlowClient
+</script>
+
+<template>
+  <FormFlow :form="schema" :options="{ baseUrl }" v-slot="f">
+    <form v-bind="f.formProps">
+      <FormFlowField
+        v-for="field in f.fields.value"
+        :key="field.name"
+        :name="field.name"
+        v-slot="ff"
+      >
+        <label v-bind="ff.labelProps.value">{{ field.label }}</label>
+        <input v-bind="ff.inputProps.value" />
+      </FormFlowField>
+      <button :disabled="f.isSubmitting.value">
+        {{ schema.settings.submitButtonText }}
+      </button>
+    </form>
+  </FormFlow>
+</template>`,
   },
 ];
 
@@ -164,17 +227,21 @@ const endpoints = [
 const pricing: {
   tier: string;
   badge: Tier;
-  price: string;
-  cadence?: string;
   blurb: string;
   features: string[];
+  price?: string;
+  cadence?: string;
+  cta?: string;
+  available: boolean;
   featured?: boolean;
 }[] = [
   {
     tier: 'Free',
     badge: 'free',
     price: '$0',
-    cadence: 'forever, MIT',
+    cadence: 'free forever · MIT',
+    cta: 'Install free',
+    available: true,
     blurb: 'A production-ready form builder. Not a trial.',
     features: [
       'Unlimited forms & submissions',
@@ -189,10 +256,8 @@ const pricing: {
   {
     tier: 'Pro',
     badge: 'pro',
-    price: '$99–149',
-    cadence: '/ project / year · draft',
+    available: false,
     blurb: 'Everything to ship serious forms.',
-    featured: true,
     features: [
       'Everything in Free, plus —',
       'Advanced fields & conditional logic',
@@ -206,8 +271,7 @@ const pricing: {
   {
     tier: 'Business',
     badge: 'business',
-    price: '$399–699',
-    cadence: '/ year · draft',
+    available: false,
     blurb: 'For compliance-bound teams.',
     features: [
       'Everything in Pro, plus —',
@@ -260,31 +324,6 @@ const codeSubmit = `curl -X POST \\
   -d '{ "name": "Ada Lovelace",
         "email": "ada@example.com",
         "message": "Hello from FormFlow!" }'`;
-
-const codeReact = `import {
-  FormFlowProvider, FormFlowField, useFormFlow,
-} from '@formflowjs/react';
-
-function Fields() {
-  const f = useFormFlow();
-  return (
-    <form {...f.getFormProps()}>
-      {f.fields.map((field) => (
-        <FormFlowField key={field.name} name={field.name}
-          render={(api) => (
-            <label {...api.getLabelProps()}>
-              {api.field.label}
-              <input {...api.getInputProps()} />
-              {api.invalid && <span>{api.error}</span>}
-            </label>
-          )} />
-      ))}
-      <button disabled={f.isSubmitting}>
-        {f.schema.settings.submitButtonText}
-      </button>
-    </form>
-  );
-}`;
 
 /* ------------------------------------------------------------------ *
  * Icons — low coordinate precision, no per-instance allocation.
@@ -458,12 +497,29 @@ function FormSpecimen() {
       </div>
 
       <div className="specimen-schema">
+        <span className="schema-cap">// the field above, in the schema</span>
         <span className="schema-line">
-          <span className="k">"name"</span>: <span className="s">"email"</span>,
+          <span className="p">{'{'}</span>
+        </span>
+        <span className="schema-line ind">
+          <span className="k">"name"</span>
+          <span className="p">: </span>
+          <span className="s">"email"</span>
+          <span className="p">,</span>
+        </span>
+        <span className="schema-line ind">
+          <span className="k">"type"</span>
+          <span className="p">: </span>
+          <span className="s">"email"</span>
+          <span className="p">,</span>
+        </span>
+        <span className="schema-line ind">
+          <span className="k">"required"</span>
+          <span className="p">: </span>
+          <span className="b">true</span>
         </span>
         <span className="schema-line">
-          <span className="k">"type"</span>: <span className="s">"email"</span>,{' '}
-          <span className="k">"required"</span>: <span className="b">true</span>
+          <span className="p">{'}'}</span>
         </span>
       </div>
     </div>
@@ -473,6 +529,9 @@ function FormSpecimen() {
 /* ------------------------------------------------------------------ */
 
 function App() {
+  const [activeSdk, setActiveSdk] = useState(1);
+  const sdk = sdks[activeSdk];
+
   return (
     <div className="page">
       <a className="skip-link" href="#main">
@@ -506,9 +565,6 @@ function App() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <p className="eyebrow">
-              <span className="dot" aria-hidden="true" /> Strapi v5 · open-core · headless SDKs
-            </p>
             <h1 id="hero-title">
               Build forms in Strapi.
               <br />
@@ -555,12 +611,16 @@ function App() {
           </ul>
         </section>
 
-        <section className="section pipeline" id="pipeline" aria-labelledby="pipeline-title">
-          <div className="section-head">
+        <section className="section pipeline split" id="pipeline" aria-labelledby="pipeline-title">
+          <div className="section-head pipeline-head">
             <SectionLabel index="01">The lifecycle</SectionLabel>
             <h2 id="pipeline-title">
               Every submission travels the same five stages — and FormFlow owns all of them.
             </h2>
+            <p className="section-sub">
+              From a schema in Strapi to a delivered, governed submission, one plugin handles the whole
+              path. No glue code, no stitched-together services — just the pipeline below.
+            </p>
           </div>
           <ol className="flow">
             {pipeline.map((stage, i) => (
@@ -650,7 +710,6 @@ function App() {
           <p className="field-legend">
             <span className="lg lg-free">Free</span>
             <span className="lg lg-pro">Pro</span>
-            <span className="lg lg-business">Business</span>
           </p>
         </section>
 
@@ -665,20 +724,31 @@ function App() {
           </div>
 
           <div className="sdk-layout">
-            <div className="sdk-cards">
-              {sdks.map((sdk) => (
-                <Reveal key={sdk.name}>
-                  <article className="sdk-card">
-                    <span className="sdk-tag">{sdk.tag}</span>
-                    <h3>{sdk.name}</h3>
-                    <p>{sdk.body}</p>
-                    <code className="sdk-install">{sdk.install}</code>
-                  </article>
+            <div className="sdk-cards" role="tablist" aria-label="Choose an SDK to preview its code">
+              {sdks.map((item, i) => (
+                <Reveal key={item.name}>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={i === activeSdk}
+                    className={`sdk-card${i === activeSdk ? ' is-active' : ''}`}
+                    onClick={() => setActiveSdk(i)}
+                  >
+                    <span className="sdk-card-head">
+                      <span className="sdk-tag">{item.tag}</span>
+                      <span className="sdk-pick" aria-hidden="true">
+                        {i === activeSdk ? 'Viewing' : 'View code'}
+                      </span>
+                    </span>
+                    <h3>{item.name}</h3>
+                    <p>{item.body}</p>
+                    <code className="sdk-install">{item.install}</code>
+                  </button>
                 </Reveal>
               ))}
             </div>
             <Reveal className="sdk-code-wrap">
-              <CodeCard file="contact-form.tsx" lang="React" code={codeReact} />
+              <CodeCard file={sdk.file} lang={sdk.lang} code={sdk.code} />
               <p className="sdk-code-note">
                 Renderless fields hand you value, errors, and ARIA-complete prop getters. Full guides for
                 Next.js, Astro, Nuxt, and Vite live in the{' '}
@@ -763,8 +833,8 @@ function App() {
           </div>
           <div className="price-grid">
             {pricing.map((plan) => (
-              <article key={plan.tier} className={`price-card${plan.featured ? ' is-featured' : ''}`}>
-                {plan.featured ? <span className="price-flag">Most popular</span> : null}
+              <article key={plan.tier} className={`price-card${!plan.available ? ' is-soon' : ''}`}>
+                {plan.available ? null : <span className="price-flag soon">Coming soon</span>}
                 <div className="price-top">
                   <div className="price-tier">
                     <h3>{plan.tier}</h3>
@@ -773,8 +843,14 @@ function App() {
                   <p className="price-blurb">{plan.blurb}</p>
                 </div>
                 <div className="price-amount">
-                  <strong>{plan.price}</strong>
-                  {plan.cadence ? <span>{plan.cadence}</span> : null}
+                  {plan.available ? (
+                    <>
+                      <strong>{plan.price}</strong>
+                      {plan.cadence ? <span>{plan.cadence}</span> : null}
+                    </>
+                  ) : (
+                    <strong className="soon-price">Coming soon</strong>
+                  )}
                 </div>
                 <ul className="price-features">
                   {plan.features.map((feat) => (
@@ -786,13 +862,18 @@ function App() {
                     </li>
                   ))}
                 </ul>
-                <a className={`btn ${plan.featured ? 'btn-primary' : 'btn-ghost'} price-cta`} href="#install">
-                  {plan.badge === 'free' ? 'Install free' : 'Get a license'}
-                </a>
+                {plan.available ? (
+                  <a className="btn btn-primary price-cta" href="#install">
+                    {plan.cta}
+                  </a>
+                ) : (
+                  <button className="btn btn-ghost price-cta" type="button" disabled aria-disabled="true">
+                    Coming soon
+                  </button>
+                )}
               </article>
             ))}
           </div>
-          <p className="price-foot">Pro and Business figures are draft launch pricing and may change before release.</p>
         </section>
 
         <section className="section matrix" aria-labelledby="matrix-title">
